@@ -34,14 +34,14 @@ For Assists:
     
 
 Known Issues:
-  May crash when undoing, particularly using Assists (though this may be resolved)
-  Assists stop following your mouse cursor on mousedown.
+1. May crash when undoing, particularly using Assists (though this may be resolved)
+2. Assists stop following your mouse cursor on mousedown.
   
  Future Goals: 
-  Additional Perspective Modes
-  Add dutch angle support for two point perspective
-  Rulers
-  Snapping
-  Switching to use OpenGL instead of Grease Pencil for grids/assists
-  Add additional error handling 
-  Figure out an alternative for locking objects.
+1. Additional Perspective Modes
+2. Add dutch angle support for two point perspective
+3. Rulers
+4. Snapping
+5. Switching to use OpenGL instead of Grease Pencil for grids/assists
+6. Add additional error handling 
+7. Figure out an alternative for locking objects.
