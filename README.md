@@ -31,7 +31,12 @@ For Assists:
   6. Click ESC on your keyboard to get rid of the assists.
   7. Click Release Locks to make other objects selectable.
     
-    
+General Notes: 
+LineCount = How many lines exist for the One Point Perspective map
+Line Width = How thick the lines are for the 1PP Map.
+2PP Density = How many lines exist for the 2PP Grid
+2PP Spacing = How spaced out the lines are for the 2PP Grid.
+You can always assign a material or change the transparency of the grease pencil objects, aka treat them as any other object.
 
 Known Issues:
 1. May crash when undoing, particularly using Assists (though this may be resolved)
@@ -45,3 +50,4 @@ Known Issues:
 5. Switching to use OpenGL instead of Grease Pencil for grids/assists
 6. Add additional error handling 
 7. Figure out an alternative for locking objects.
+8. Allow assigning transparency/materials to grease pencil grids
