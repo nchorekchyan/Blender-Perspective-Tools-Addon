@@ -6,6 +6,8 @@ As this is still in test mode, I recommend not using this on a file you have in 
 
 The real goal is to add similar functionality to Krita's perspective assists to blender.
 
+Running this add-on, you should see a Perspective Grid panel appear on your "n" menu.
+
 Instructions:
 For One Point Perspective:
 1. Click Create 1PP VP to create your base object. A single point will be created in grease pencil, move it wherever you want.
