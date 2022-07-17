@@ -7,19 +7,19 @@ As this is still in test mode, I recommend not using this on a file you have in 
 The real goal is to add similar functionality to Krita's perspective assists to blender.
 
 Instructions:
-  For One Point Perspective:
-    1. Click Create 1PP VP to create your base object. A single point will be created in grease pencil, move it wherever you want.
-    2. Clicking Create 1PP VP multiple times will purge vanishing points or lines associated with it (it deletes/recreates)
-    3. Click Create 1PP Map to create a set of lines pointing to the vanishing point.
-    4. In the One Point Perspective objects Edit Mode, you can move the vanishing point and click Create 1PP Map to create additional lines pointing to the vanishing point.
- 
- For Two Point Perspective:
-    1. Click Create 2PP VPs to create your base object. A line with two points will be created. The points are your vanishing points.
-    2. Clicking Create 2PP VPs multiple times will purge vanishing points or lines associated with it (it deletes/recreates)
-    3. Click Create 2PP Grid to create a two point perspective grid.
-    4. In the Two Point Perspective objects Edit Mode, you can move the vanishing point and click Create 1PP Map to create additional lines pointing to the vanishing point.
-      NOTE: Currently, it must be along the same X axis (so while moving the points, tap 'X' on your keyboard to lock it. 
-      Math is missing for dutch angles. For now, just rotate the grease pencil object if you need a dutch angle grid.
+For One Point Perspective:
+1. Click Create 1PP VP to create your base object. A single point will be created in grease pencil, move it wherever you want.
+2. Clicking Create 1PP VP multiple times will purge vanishing points or lines associated with it (it deletes/recreates)
+3. Click Create 1PP Map to create a set of lines pointing to the vanishing point.
+4. In the One Point Perspective objects Edit Mode, you can move the vanishing point and click Create 1PP Map to create additional lines pointing to the vanishing point.
+
+For Two Point Perspective:
+1. Click Create 2PP VPs to create your base object. A line with two points will be created. The points are your vanishing points.
+2. Clicking Create 2PP VPs multiple times will purge vanishing points or lines associated with it (it deletes/recreates)
+3. Click Create 2PP Grid to create a two point perspective grid.
+4. In the Two Point Perspective objects Edit Mode, you can move the vanishing point and click Create 1PP Map to create additional lines pointing to the vanishing point.
+  NOTE: Currently, it must be along the same X axis (so while moving the points, tap 'X' on your keyboard to lock it. 
+    Math is missing for dutch angles. For now, just rotate the grease pencil object if you need a dutch angle grid.
 
 For Assists:
   1. Make sure you have a Two Point Perspective object (click Create 2PP VPs).
