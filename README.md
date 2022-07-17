@@ -34,11 +34,11 @@ For Assists:
   7. Click Release Locks to make other objects selectable.
     
 General Notes: 
-LineCount = How many lines exist for the One Point Perspective map
-Line Width = How thick the lines are for the 1PP Map.
-2PP Density = How many lines exist for the 2PP Grid
-2PP Spacing = How spaced out the lines are for the 2PP Grid.
-You can always assign a material or change the transparency of the grease pencil objects, aka treat them as any other object.
+1. LineCount = How many lines exist for the One Point Perspective map
+2. Line Width = How thick the lines are for the 1PP Map.
+3. 2PP Density = How many lines exist for the 2PP Grid. Recommend Defaults.
+4. 2PP Spacing = How spaced out the lines are for the 2PP Grid. Recommend Defaults.
+5. You can always assign a material or change the transparency of the grease pencil objects, aka treat them as any other object.
 
 Known Issues:
 1. May crash when undoing, particularly using Assists (though this may be resolved)
