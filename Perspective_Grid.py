@@ -5,8 +5,6 @@ import blf
 from mathutils import Vector
 from bpy_extras import view3d_utils
 
-#NOTE: 2PPSPACING SETTINGS DISABLED UNTIL OPTIMIZED/FIXED
-
 ###### GENERIC INTRO ######
 
 bl_info = {
@@ -20,11 +18,45 @@ bl_info = {
 }
 
 
+
+
+#Custom Settings for Perspective Grid
+class ScenePerspectiveSettings(bpy.types.PropertyGroup):
+    # use an annotation
+    LineCount : bpy.props.IntProperty(
+        name = "LineCount",
+        description = "",
+        default = 20,
+        min = 1,
+        max = 100
+        )    
+    LineWidth : bpy.props.IntProperty(
+        name = "LineWidth",
+        description = "",
+        default = 1,
+        min = 1,
+        max = 5
+        ) 
+    LineDensity2PP : bpy.props.IntProperty(
+        name = "2PP Density",
+        description = "",
+        default = 1000,
+        min = 1,
+        max = 2000
+        ) 
+    Spacing2PP : bpy.props.IntProperty(
+        name = "2PP Spacing",
+        description = "",
+        default = 1,
+        min = 1,
+        max = 5
+        ) 
+
 ######################################### UI ###########################################
 #PANEL FOR UI###############
 
-class PerspectiveGridPanel(bpy.types.Panel):
-    bl_idname = "PerspectiveGridPanel.panel1"
+class PERSPECTIVEGRID_PT_main(bpy.types.Panel):
+    bl_idname = "PERSPECTIVEGRID_PT_main.panel"
     bl_label = "Perspective Grid Panel"
     bl_space_type = "VIEW_3D"
     bl_region_type = "UI"
@@ -43,10 +75,10 @@ class PerspectiveGridPanel(bpy.types.Panel):
         row3=self.layout.row(align=True)
         row4=self.layout.row(align=True)
         
-        row1.prop(context.scene, "LineCount")    
-        row2.prop(context.scene, "LineWidth")
-        row3.prop(context.scene, "LineDensity2PP")
-        row4.prop(context.scene, "Spacing2PP")
+        row1.prop(PerspectiveSettings, "LineCount")    
+        row2.prop(PerspectiveSettings, "LineWidth")
+        row3.prop(PerspectiveSettings, "LineDensity2PP")
+        row4.prop(PerspectiveSettings, "Spacing2PP")
         
         
         scene = context.scene
@@ -172,7 +204,7 @@ def GP_CREATE(gp_name):
     gp_frame = gp_layer.frames.new(bpy.context.scene.frame_current)
     #Create stroke for the Horizon Line or VPs
     gp_stroke = gp_frame.strokes.new()
-    gp_stroke.line_width = bpy.context.scene['LineWidth'] + 10
+    gp_stroke.line_width = PerspectiveSettings.LineWidth + 10
 
     return gp_data
 
@@ -181,7 +213,7 @@ def GP_CREATE(gp_name):
 def GP_VP_CREATION(gp_input, vp_count):
 
     gp_stroke = gp_input.layers[0].frames[0].strokes[0]
-    gp_stroke.line_width = bpy.context.scene['LineWidth'] + 10
+    gp_stroke.line_width = PerspectiveSettings.LineWidth + 10
 
     #Add the Vanishing Point
     if vp_count == 1:
@@ -200,8 +232,8 @@ def GP_VP_CREATION(gp_input, vp_count):
 
 def GP_1PP_MAP(gp_input):
 
-    linecount = bpy.context.scene['LineCount']
-    line_width = bpy.context.scene['LineWidth']
+    linecount = PerspectiveSettings.LineCount
+    line_width = PerspectiveSettings.LineWidth
     radius = 15
     vp_loc = gp_input.layers[0].frames[0].strokes[0].points[0].co
 
@@ -219,9 +251,9 @@ def GP_1PP_MAP(gp_input):
 #TWO POINT PERSPECTIVE MAP
 def GP_2PP_MAP(gp_input):
 
-    density = bpy.context.scene['LineDensity2PP']
-    line_width = bpy.context.scene['LineWidth'] 
-    spacing = bpy.context.scene['Spacing2PP']   
+    density = PerspectiveSettings.LineDensity2PP
+    line_width = PerspectiveSettings.LineWidth 
+    spacing = PerspectiveSettings.Spacing2PP  
     plot_y = 0 
     plot_z_top = 5
     plot_z_bottom = -5
@@ -274,101 +306,96 @@ def GP_2PP_MAP(gp_input):
 ########################################################
 #TWO POINT PERSPECTIVE ASSISSTS
 class TWOPOINTPERSPECTIVE_OT_guide(bpy.types.Operator):
+
     bl_idname = "twopointperspective.guide"
     bl_label = "Two Point Perspective Guide"
 
- #        global gp_Assist
-        
-    
-    #Force Delete/Recreation if any leftover GP data exists
-    try:
-        gp_Assist = bpy.data.grease_pencils['Assist Tool']
-        bpy.data.grease_pencils.remove(bpy.data.grease_pencils['Assist Tool'])
-    except:
-        print("Great")
-    
-    gp_Assist = GP_CREATE('Assist Tool')        
-    
-    
-    try:
-        gp_Assist.layers['Assists']
-    except:
-        gp_Assist_layer = gp_Assist.layers.new('Assists')
-        gp_Assist_frame = gp_Assist_layer.frames.new(bpy.context.scene.frame_current)
-        gp_Assist_stroke = gp_Assist_frame.strokes.new()
 
-        gp_Assist_stroke.line_width = bpy.context.scene['LineWidth'] + 10
 
-        gp_Assist_point = gp_Assist_stroke.points.add(count = 3)
-        
-    gp_Assist = bpy.data.grease_pencils['Assist Tool']  
-    gp_Assist.layers['Assists'].frames[0].strokes[0].points[0].co = bpy.data.grease_pencils['Two Point Perspective'].layers[0].frames[0].strokes[0].points[0].co
-    gp_Assist.layers['Assists'].frames[0].strokes[0].points[1].co = bpy.data.grease_pencils['Two Point Perspective'].layers[0].frames[0].strokes[0].points[1].co 
-    gp_Assist.layers['Assists'].frames[0].strokes[0].points[2].co = bpy.data.grease_pencils['Two Point Perspective'].layers[0].frames[0].strokes[0].points[1].co        
-               
 
 
     def modal(self, context, event):
 
+      
         context.area.tag_redraw()
+        
+        #Get the mouse position thanks to the event            
+        self.mouse_pos = event.mouse_region_x, event.mouse_region_y
+        
+        #Contextual active object, 2D and 3D regions
+        self.object = bpy.context.object
+        region = bpy.context.region
+        region3D = bpy.context.space_data.region_3d
 
-        if event.type != 'ESC':
-            #Get the mouse position thanks to the event            
-            self.mouse_pos = event.mouse_region_x, event.mouse_region_y
-            
-            #Contextual active object, 2D and 3D regions
-            self.object = bpy.context.object
-            region = bpy.context.region
-            region3D = bpy.context.space_data.region_3d
-
-            #The direction indicated by the mouse position from the current view
-            self.view_vector = view3d_utils.region_2d_to_vector_3d(region, region3D, self.mouse_pos)
-            #The view point of the user
-            self.view_point = view3d_utils.region_2d_to_origin_3d(region, region3D, self.mouse_pos)
-            #The 3D location in this direction
-            self.world_loc = view3d_utils.region_2d_to_location_3d(region, region3D, self.mouse_pos, self.view_vector)
-
+        #The direction indicated by the mouse position from the current view
+        self.view_vector = view3d_utils.region_2d_to_vector_3d(region, region3D, self.mouse_pos)
+        #The view point of the user
+        self.view_point = view3d_utils.region_2d_to_origin_3d(region, region3D, self.mouse_pos)
+        #The 3D location in this direction
+        self.world_loc = view3d_utils.region_2d_to_location_3d(region, region3D, self.mouse_pos, self.view_vector)
  
-            z = Vector( (0,0,1) )
-            self.normal = z
+        z = Vector( (0,0,1) )
+        self.normal = z
 
-            if self.object:
-                bpy.data.grease_pencils['Assist Tool'].layers['Assists'].frames[0].strokes[0].points[1].co = self.world_loc
-                self.object.rotation_euler = z.rotation_difference( self.normal ).to_euler()
+        if self.object:
+            bpy.data.grease_pencils['Assist Tool'].layers['Assists'].frames[0].strokes[0].points[1].co = self.world_loc
+            self.object.rotation_euler = z.rotation_difference( self.normal ).to_euler()
 
         #ESC to Escape Assists
-        elif event.type in {'ESC'}:
-#            bpy.types.SpaceView3D.draw_handler_remove(self._handle, 'WINDOW')
-#            gp_Assist.layers['Assists'].frames[0].strokes[0].points[0].co = gp_2PP.layers[0].frames[0].strokes[0].points[0].co
+        if event.type in {'ESC'}:
             bpy.data.grease_pencils['Assist Tool'].layers['Assists'].frames[0].strokes[0].points[1].co = bpy.data.grease_pencils['Two Point Perspective'].layers[0].frames[0].strokes[0].points[1].co
-#            gp_Assist.layers['Assists'].frames[0].strokes[0].points[2].co = gp_2PP.layers[0].frames[0].strokes[0].points[1].co
+            context.window_manager.event_timer_remove(self.timer)
             return {'CANCELLED'}
+        elif event.type == 'MOUSEMOVE':
+            bpy.ops.gpencil.draw('INVOKE_DEFAULT',wait_for_input=False)
+            return {'RUNNING_MODAL'}
 
-        return {'PASS_THROUGH'}
+        return {'RUNNING_MODAL'}
     
     #############
     
     def invoke(self, context, event):
+        self.timer = context.window_manager.event_timer_add(1e3, window=context.window)
+        
+        try:
+            gp_Assist = bpy.data.grease_pencils['Assist Tool']
+            bpy.data.grease_pencils.remove(bpy.data.grease_pencils['Assist Tool'])
+        except:
+            print("Great")
+        
+        gp_Assist = GP_CREATE('Assist Tool')        
+        
+        
+        try:
+            gp_Assist.layers['Assists']
+        except:
+            gp_Assist_layer = gp_Assist.layers.new('Assists')
+            gp_Assist_frame = gp_Assist_layer.frames.new(bpy.context.scene.frame_current)
+            gp_Assist_stroke = gp_Assist_frame.strokes.new()
+
+            gp_Assist_stroke.line_width = PerspectiveSettings.LineWidth + 10
+
+            gp_Assist_point = gp_Assist_stroke.points.add(count = 3)
+
+
+        gp_Assist = bpy.data.grease_pencils['Assist Tool']  
+        gp_Assist.layers['Assists'].frames[0].strokes[0].points[0].co = bpy.data.grease_pencils['Two Point Perspective'].layers[0].frames[0].strokes[0].points[0].co
+        gp_Assist.layers['Assists'].frames[0].strokes[0].points[1].co = bpy.data.grease_pencils['Two Point Perspective'].layers[0].frames[0].strokes[0].points[1].co 
+        gp_Assist.layers['Assists'].frames[0].strokes[0].points[2].co = bpy.data.grease_pencils['Two Point Perspective'].layers[0].frames[0].strokes[0].points[1].co        
+
+        
+        
+        
+        
         if context.area.type == 'VIEW_3D':
             args = (self, context)
-#            self._handle = bpy.types.SpaceView3D.draw_handler_add(draw_callback_px, args, 'WINDOW', 'POST_PIXEL')
-
-            #Keeps mouse position current 3D location and current object for the draw callback
-            #(not needed to make it self attribute if you don't want to use the callback)
-            self.mouse_pos = [0,0]
-            self.loc = [0,0,0]
-            self.object = None
-            self.view_point = None
-            self.view_vector = None
-            self.world_loc = None
-            self.loc_on_plane = None
-            self.normal = None
-
             context.window_manager.modal_handler_add(self)
             return {'RUNNING_MODAL'}
         else:
             gp_Assist.layers['Assists'].frames[0].strokes[1].points[1].co = self.world_loc
+            context.window_manager.event_timer_remove(self.timer)
             return {'CANCELLED'}
+        
         
 ########################################################
 
@@ -384,10 +411,20 @@ def filter_callback(self, object):
 ####### TESTING
 
 
+#bpy.utils.register_class(ScenePerspectiveSettings)
+#bpy.types.Scene.PerspectiveSettings = bpy.props.CollectionProperty(type=ScenePerspectiveSettings)
+#PerspectiveSettings = bpy.context.scene.PerspectiveSettings.add()
+
 #REGISTRATION#############################################
 
 def register():
-    bpy.utils.register_class(PerspectiveGridPanel)
+    
+    #new
+    bpy.utils.register_class(ScenePerspectiveSettings)
+    bpy.types.Scene.PerspectiveSettings = bpy.props.CollectionProperty(type=ScenePerspectiveSettings)
+    
+    
+    bpy.utils.register_class(PERSPECTIVEGRID_PT_main)
     bpy.utils.register_class(ONEPOINTPERSPECTIVE_OT_obj)
     bpy.utils.register_class(ONEPOINTPERSPECTIVE_OT_vp)
     bpy.utils.register_class(TWOPOINTPERSPECTIVE_OT_obj)
@@ -396,10 +433,6 @@ def register():
     bpy.utils.register_class(TWOPOINTPERSPECTIVERELEASE_OT_lock)
     bpy.utils.register_class(TWOPOINTPERSPECTIVELOCK_OT_lock)
 
-    bpy.types.Scene.LineCount = bpy.props.IntProperty(name="LineCount", default=20, min=1, max=100)
-    bpy.types.Scene.LineWidth = bpy.props.IntProperty(name="LineWidth", default=1, min=1, max=5)
-    bpy.types.Scene.LineDensity2PP = bpy.props.IntProperty(name="2PP Density", default=20, min=1, max=2000)
-    bpy.types.Scene.Spacing2PP = bpy.props.FloatProperty(name="2PP Spacing", default=1, min=.1, max=5)
 
     bpy.types.Scene.my_collection = PointerProperty(
         name="Collection",
@@ -412,7 +445,10 @@ def register():
 #UNREGISTRATION
     
 def unregister():
-    bpy.utils.unregister_class(PerspectiveGridPanel)
+    
+    bpy.utils.unregister_class(ScenePerspectiveSettings)
+   
+    bpy.utils.unregister_class(PERSPECTIVEGRID_PT_main)
     bpy.utils.unregister_class(ONEPOINTPERSPECTIVE_OT_obj)
     bpy.utils.unregister_class(ONEPOINTPERSPECTIVE_OT_vp)
     bpy.utils.unregister_class(TWOPOINTPERSPECTIVE_OT_obj)
@@ -429,16 +465,17 @@ def unregister():
         name="Object",
         type=bpy.types.Object,
         poll=filter_callback)
+  
         
-    del bpy.types.Scene.LineCount
-    del bpy.types.Scene.LineWidth
-    del bpy.types.Scene.LineDensity2PP
-    del bpy.types.Scene.Spacing2PP
-
+    del bpy.types.Scene.PerspectiveSettings
     del bpy.types.Scene.my_collection
     del bpy.types.Collection.my_collection_objects
     
+    
+
+    
 if __name__ == '__main__':
     register()
+    PerspectiveSettings = bpy.context.scene.PerspectiveSettings.add()
 
 
